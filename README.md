@@ -270,8 +270,6 @@ AAC 格式:
 - 初始化重采样
 - 进行重采样
 
-
-
 ## 三、视频基础
 
 ### 1. 图像的基本概念
@@ -318,78 +316,91 @@ AAC 格式:
 
 #### 5.2 GOP
 
+#### 5.3 I帧、P帧、B帧
+
+#### 5.4 宏块
+
+#### 5.5 帧内压缩
+
+#### 5.6 帧间压缩
+
+#### 5.7 无损压缩
+
+#### 5.8 H264码流结构
 
 
-## 四、ffmpeg采集设备
 
-ffmpeg 在 linux下支持多种采集设备，包括 FrameBuffer (fbdev)、v4l2、DV1394、OSS、x11grab。
+## 四、ffmpeg命令
+
+### 1. 命令分类
+
+- 基本信息查询命令
+- 录制命令
+- 分解 & 复用命令（格式转换）
+- 处理原始数据命令
+- 裁剪与合并命令
+- 图片与视频互转命令
+- 直播命令
+- 滤镜命令
+
+### 2. ffmpeg处理音视频流程
+
+```mermaid
+graph TB
+
+A[输入文件] --> |demuxer 解封装| B[编码数据包]
+B --> |decoder 解码| C[解码后的数据帧]
+C --> |encoder 编码| D[编码后的数据包]
+D --> |muxer 封装| E[输出文件]
+```
+
+### 3. 基本信息查询命令
+
+| 命令         | 说明                          |
+| :----------- | :---------------------------- |
+| -version     | 查看版本                      |
+| -demuxers    | 查看可用的解封装器（demuxer） |
+| -muxers      | 查看可用的封装器（muxer)      |
+| -devices     | 查看可用的设备                |
+| -codecs      | 查看可用的编解码器            |
+| -decoders    | 查看可用的解码器              |
+| -encoders    | 查看可用的编码器              |
+| -bsfs        | 查看比特流 filter             |
+| -formats     | 查看可用的格式                |
+| -protocols   | 查看可用的协议                |
+| -filters     | 查看可用的滤镜                |
+| -pix_fmts    | 查看可用的像素格式            |
+| -sample_fmts | 查看可用的采样格式            |
+| -layouts     | 查看channel名称               |
+| -colors      | 查看颜色名称                  |
+
+### 4. 录制命令
+
+ffmpeg 在 linux下支持多种采集设备，包括 **fbdev**、**v4l2**、**x11grab**
 
 查看支持的设备列表
 
 ```
-machun@ubuntu:~/tmp$ ffmpeg -hide_banner -devices
-Devices:
- D. = Demuxing supported
- .E = Muxing supported
- --
- DE alsa            ALSA audio output
- DE fbdev           Linux framebuffer
- D  lavfi           Libavfilter virtual input device
- DE oss             OSS (Open Sound System) playback
-  E sdl,sdl2        SDL2 output device
- DE sndio           sndio audio playback
- DE video4linux2,v4l2 Video4Linux2 output device
- D  x11grab         X11 screen capture, using XCB
-  E xv              XV (XVideo) output device
+machun@ubuntu:~/tmp$ ffmpeg -devices
 ```
 
-其中，D表示输入设备，E表示输出设备
+- fbdev：用于图像展示操作
+- v4l2：采集摄像头数据
+- x11grab：录制屏幕
 
-#### 1. fbdev设备
-
-FrameBuffer专门用于图像展示操作
-
-参数如下
+#### 4.1 桌面
 
 ```
-machun@ubuntu:~/tmp$ ffmpeg -h demuxer=fbdev
-ffmpeg version 4.1 Copyright (c) 2000-2018 the FFmpeg developers
-  built with gcc 5.4.0 (Ubuntu 5.4.0-6ubuntu1~16.04.11) 20160609
-  configuration: 
-  libavutil      56. 22.100 / 56. 22.100
-  libavcodec     58. 35.100 / 58. 35.100
-  libavformat    58. 20.100 / 58. 20.100
-  libavdevice    58.  5.100 / 58.  5.100
-  libavfilter     7. 40.101 /  7. 40.101
-  libswscale      5.  3.100 /  5.  3.100
-  libswresample   3.  3.100 /  3.  3.100
-Demuxer fbdev [Linux framebuffer]:
-fbdev indev AVOptions:
-  -framerate         <video_rate> .D.......  (default "25")
+ffmpeg -f x11grab -s 1920x1080 -r 25 -i :0.0+0+0 luping.mp4
 ```
 
+#### 4.2 摄像头
 
+#### 4.3 麦克风
 
-```
-ffmpeg -framerate 25 -f fbdev -i /dev/fb0 output.mp4
-```
+#### 4.4 摄像头 + 麦克风
 
-#### 2. v4l2设备
+#### 4.5 桌面 + 麦克风
 
-用于采集摄像头数据
-
-查看参数：
-
-```
-machun@ubuntu:~/tmp$ ffmpeg -h demuxer=v4l2
-```
-
-#### 3. x11grab设备
-
-用于录制屏幕
-
-
-
-## 五、ffmpeg流媒体
 
 
